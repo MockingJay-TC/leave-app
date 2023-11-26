@@ -15,14 +15,23 @@ const _collection = collection(db, "users");
 
 export const updateUser = async (
   id: string,
-  data: { staus: string; leaveDays: number; startDate: string }
+  data: {
+    status: string;
+    startDate: string;
+    requestedDays: number;
+    leaveDays: number;
+  }
 ) => {
   const user = doc(_collection, id);
-  return await updateDoc(user, data);
+  try {
+    return await updateDoc(user, data);
+  } catch (error) {
+    console.error("Error updating document:", error);
+  }
 };
 
 export const getUser = async (
-  option: "firstName" | "email" | "lastName",
+  option: "firstName" | "email" | "lastName" | "role" | "status",
   value: string
 ) => {
   return getDocs(query(_collection, where(option, "==", value)));

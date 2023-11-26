@@ -3,18 +3,24 @@ import { useNavigate } from "react-router-dom";
 import { login } from "../services/auth";
 
 const Loginpage = () => {
+  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
   const handleLogin = () => {
+    setLoading(true);
     const data = {
       email,
       password,
     };
-    login(data).then(() => {
-      navigate("/");
-    });
+    login(data)
+      .then(() => {
+        setLoading(false);
+      })
+      .finally(() => {
+        navigate("/");
+      });
   };
 
   return (
@@ -50,6 +56,7 @@ const Loginpage = () => {
                 Email*
               </label>
               <input
+                required
                 id="email"
                 type="email"
                 placeholder="mail@loopple.com"
@@ -63,6 +70,7 @@ const Loginpage = () => {
                 Password*
               </label>
               <input
+                required
                 id="password"
                 type="password"
                 placeholder="Enter a password"
@@ -103,7 +111,7 @@ const Loginpage = () => {
                 }}
                 className="hover:bg-purple-blue-600 focus:ring-purple-blue-100 bg-purple-blue-500 mb-5 w-full rounded-2xl px-6 py-5 text-sm font-bold leading-none text-green-800 transition duration-300 focus:ring-4 md:w-96"
               >
-                Sign In
+                {loading ? "loading..." : "Sign In"}
               </button>
             </form>
           </div>

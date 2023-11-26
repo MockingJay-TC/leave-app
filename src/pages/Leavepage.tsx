@@ -1,6 +1,7 @@
 import { BookOpenIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import DatePicker from "../components/DatePicker";
+import { updateUser } from "../services/database";
 import { calculateDays } from "../utils/calculateDays";
 import { countWeekends } from "../utils/calculateLeave";
 
@@ -9,11 +10,29 @@ const Leavepage = () => {
   const [fromDate, setFromDate] = useState<number>(0);
   const [toDate, setToDate] = useState<number>(0);
 
+  const leaveDays = JSON.parse(localStorage.getItem("user") as string)?.user
+    ?.leaveDays;
+  const id = JSON.parse(localStorage.getItem("user") as string)?.user.id;
+
   const handleFromChange = (value: string) => {
     setFromDate(new Date(value).getTime());
   };
   const handleToChange = (value: string) => {
     setToDate(new Date(value).getTime());
+  };
+
+  const handleLeave = async () => {
+    const data = {
+      status: "pending",
+      startDate: new Date(fromDate).toDateString(),
+      requestedDays: noOfDays,
+      leaveDays: leaveDays,
+    };
+    updateUser(id, data);
+  };
+
+  const handleDisable = (): boolean => {
+    return noOfDays ? noOfDays <= leaveDays : false;
   };
 
   useEffect(() => {
@@ -25,25 +44,24 @@ const Leavepage = () => {
 
   return (
     <div className="w-full h-screen overflow-hidden bg-ten inset-0 bg-no-repeat bg-cover relative flex">
-      <div className="w-[20%] h-full bg-green-100 left-0 shadow-xl z-50 py-24"></div>
       <div className="py-24  my-20 rounded-lg w-full mx-32 px-24 text-green-800">
         <div className="bg-green-100 font-bold rounded-xl grid grid-cols-3 text-center py-8 text-lg divide-x-2 divide-green-900">
-          <div>
+          <div className="gap-4 flex items-center justify-center">
             <span className="text-green-900 font-extrabold shadow-md py-1 px-2 rounded-md bg-white ">
-              20
-            </span>{" "}
+              {leaveDays}
+            </span>
             <span>Leaves Available</span>
           </div>
-          <div>
-            <span className="text-green-900 font-extrabold shadow-md py-1 px-2 rounded-md bg-white ">
-              5
-            </span>{" "}
+          <div className="gap-4 flex items-center justify-center">
+            <span className=" text-green-900 font-extrabold shadow-md py-1 px-2 rounded-md bg-white ">
+              {20 - leaveDays}
+            </span>
             <span>Leaves Taken</span>
           </div>
-          <div>
+          <div className="gap-4 flex items-center justify-center">
             <span className="text-green-900 font-extrabold shadow-md py-1 px-2 rounded-md bg-white ">
-              20
-            </span>{" "}
+              {leaveDays}
+            </span>
             <span>This Month</span>
           </div>
         </div>
@@ -71,7 +89,24 @@ const Leavepage = () => {
                 </div>
               </div>
             </div>
-            <div>1</div>
+            <div className="flex flex-col space-y-4 items-center justify-center">
+              <button
+                disabled={!handleDisable()}
+                onClick={() => handleLeave()}
+                className={`${
+                  !handleDisable()
+                    ? "bg-black/10 text-black/50"
+                    : "bg-green-100"
+                } py-2 px-4  text-green-900 rounded-lg`}
+              >
+                BOOK LEAVE
+              </button>
+              {noOfDays > 20 && (
+                <p className="text-[tomato] italic block">
+                  You have exceeded available days
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>

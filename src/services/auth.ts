@@ -18,7 +18,7 @@ export const login = async ({
       await getUser("email", email).then(
         (response: QuerySnapshot<DocumentData>) => {
           let _user: DocumentData = {};
-          response.forEach((u) => (_user = u.data()));
+          response.forEach((u) => (_user = { ...u.data(), id: u.id }));
           user = { ...user, user: _user };
           localStorage.setItem("user", JSON.stringify(user));
         }
