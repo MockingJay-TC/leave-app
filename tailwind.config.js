@@ -6,6 +6,9 @@ export default {
       fontFamily: {
         nunito: ["Nunito Sans", "sans-serif"],
       },
+      backgroundImage: {
+        ten: "url('./assets/ttten.svg')",
+      },
     },
   },
   plugins: [],

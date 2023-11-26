@@ -1,14 +1,12 @@
 import { initializeApp } from "firebase/app";
 
-const config = import.meta.env;
-
 const firebaseConfig = {
-  apiKey: config.API_KEY,
-  authDomain: config.AUTH_DOMAIN,
-  projectId: config.PROJECT_ID,
-  storageBucket: config.STORAGE_BUCKET,
-  messagingSenderId: config.SENDER_ID,
-  appId: config.APP_ID,
+  apiKey: "AIzaSyBx_UrPbu56OKfMrrLmBm_OftMKCMtqzbE",
+  authDomain: "leave-app-9290a.firebaseapp.com",
+  projectId: "leave-app-9290a",
+  storageBucket: "leave-app-9290a.appspot.com",
+  messagingSenderId: "541182156531",
+  appId: "1:541182156531:web:bec21fdfe66f14ac99e186",
 };
 
 export const app = initializeApp(firebaseConfig);
