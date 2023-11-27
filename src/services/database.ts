@@ -30,31 +30,6 @@ export const updateUser = async (
   }
 };
 
-export const notification = async (data: {
-  to: string[];
-  subject: string;
-  text: string;
-}) => {
-  const url = "http://localhost:3000/send-email";
-
-  fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .catch((error) => {
-      console.error("Fetch Error:", error);
-    });
-};
-
 export const getUser = async (
   option: "firstName" | "email" | "lastName" | "role" | "status",
   value: string

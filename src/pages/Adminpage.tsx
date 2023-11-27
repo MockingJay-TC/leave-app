@@ -1,7 +1,8 @@
 import { DocumentData, QuerySnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Leave } from "../interface/interface";
-import { getUser, notification, updateUser } from "../services/database";
+import { getUser, updateUser } from "../services/database";
+import { notification } from "../utils/notification";
 
 const AdminPage = () => {
   const email = JSON.parse(localStorage.getItem("user") as string)?.user.email;

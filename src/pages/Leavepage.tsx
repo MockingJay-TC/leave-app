@@ -1,9 +1,10 @@
 import { BookOpenIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import DatePicker from "../components/DatePicker";
-import { notification, updateUser } from "../services/database";
+import { updateUser } from "../services/database";
 import { calculateDays } from "../utils/calculateDays";
 import { countWeekends } from "../utils/calculateLeave";
+import { notifySupervisor } from "../utils/notification";
 
 const Leavepage = () => {
   const [noOfDays, setNoOfDays] = useState<number>(0);
@@ -13,7 +14,6 @@ const Leavepage = () => {
   const leaveDays = JSON.parse(localStorage.getItem("user") as string)?.user
     ?.leaveDays;
   const id = JSON.parse(localStorage.getItem("user") as string)?.user.id;
-  const email = JSON.parse(localStorage.getItem("user") as string)?.user.email;
   const supervisor = JSON.parse(localStorage.getItem("user") as string)?.user
     .supervisor;
 
@@ -34,11 +34,7 @@ const Leavepage = () => {
     };
     updateUser(id, data);
 
-    notification({
-      to: [supervisor],
-      subject: "Leave Request",
-      text: `Leave Request from ${email}`,
-    });
+    notifySupervisor(fromDate, supervisor);
   };
 
   const handleDisable = (): boolean => {

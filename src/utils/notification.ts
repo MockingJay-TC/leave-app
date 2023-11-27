@@ -19,11 +19,41 @@ export function notifySupervisor(
     const reminderTime = Date.now() + i * reminderInterval;
     setTimeout(() => {
       sendNotification(supervisorEmail, `Leave Reminder - ${i} day(s) before`);
+      notification({
+        to: [supervisorEmail],
+        subject: "Leave Request",
+        text: `Leave Request Notification`,
+      });
     }, reminderTime);
   }
 }
 
-export function sendNotification(email, message) {
+export const notification = async (data: {
+  to: string[];
+  subject: string;
+  text: string;
+}) => {
+  const url = "http://localhost:3000/send-email";
+
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Fetch Error:", error);
+    });
+};
+
+export function sendNotification(email: string, message: string) {
   // Implement your notification logic here, e.g., sending an email
   console.log(`Sending notification to ${email}: ${message}`);
 }
@@ -31,4 +61,4 @@ export function sendNotification(email, message) {
 // Example usage:
 const leaveStartDate = new Date("2023-12-01"); // Set the leave start date
 const supervisorEmail = "supervisor@example.com"; // Set the supervisor's email
-notifySupervisor(leaveStartDate, supervisorEmail);
+notifySupervisor(leaveStartDate.getTime(), supervisorEmail);
