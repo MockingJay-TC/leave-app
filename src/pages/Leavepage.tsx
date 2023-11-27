@@ -1,7 +1,7 @@
 import { BookOpenIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import DatePicker from "../components/DatePicker";
-import { updateUser } from "../services/database";
+import { notification, updateUser } from "../services/database";
 import { calculateDays } from "../utils/calculateDays";
 import { countWeekends } from "../utils/calculateLeave";
 
@@ -13,6 +13,9 @@ const Leavepage = () => {
   const leaveDays = JSON.parse(localStorage.getItem("user") as string)?.user
     ?.leaveDays;
   const id = JSON.parse(localStorage.getItem("user") as string)?.user.id;
+  const email = JSON.parse(localStorage.getItem("user") as string)?.user.email;
+  const supervisor = JSON.parse(localStorage.getItem("user") as string)?.user
+    .supervisor;
 
   const handleFromChange = (value: string) => {
     setFromDate(new Date(value).getTime());
@@ -25,10 +28,17 @@ const Leavepage = () => {
     const data = {
       status: "pending",
       startDate: new Date(fromDate).toDateString(),
+      endDate: new Date(toDate).toDateString(),
       requestedDays: noOfDays,
       leaveDays: leaveDays,
     };
     updateUser(id, data);
+
+    notification({
+      to: [supervisor],
+      subject: "Leave Request",
+      text: `Leave Request from ${email}`,
+    });
   };
 
   const handleDisable = (): boolean => {

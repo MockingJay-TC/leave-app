@@ -1,11 +1,12 @@
 import { DocumentData, QuerySnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { getUser, updateUser } from "../services/database";
 import { Leave } from "../interface/interface";
+import { getUser, notification, updateUser } from "../services/database";
 
 const AdminPage = () => {
+  const email = JSON.parse(localStorage.getItem("user") as string)?.user.email;
+
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("Approve");
   const [leaves, setLeaves] = useState<DocumentData>([]);
   useEffect(() => {
     getUser("status", "pending").then(
@@ -30,7 +31,32 @@ const AdminPage = () => {
 
     updateUser(id, data).then(() => {
       setLoading(false);
-      setStatus("Approved");
+    });
+
+    notification({
+      to: [leave.email, email],
+      subject: "Leave Request",
+      text: `Leave Request Approved for ${leave.email}`,
+    });
+  };
+
+  const rejectLeave = (leave: Leave) => {
+    setLoading(true);
+    const { id } = leave;
+    const data = {
+      status: "reject",
+      startDate: new Date(leave.startDate).toDateString(),
+      leaveDays: leave?.leaveDays,
+      requestedDays: 0,
+    };
+
+    updateUser(id, data).then(() => {
+      setLoading(false);
+    });
+    notification({
+      to: [leave.email, email],
+      subject: "Leave Request",
+      text: `Leave Request Rejected for ${leave.email}`,
     });
   };
 
@@ -72,17 +98,19 @@ const AdminPage = () => {
                       {leave.status}
                     </span>
                   </td>
-                  <div className="flex gap-8">
-                    <td
-                      onClick={() => approveLeave(leave)}
-                      className="hover:shadow-lg py-2 px-4 rounded-md inline-block my-2 text-green-900 font-extrabold bg-green-100 whitespace-nowrap"
-                    >
-                      {loading ? "loading..." : status}
-                    </td>
-                    <td className="hover:shadow-lg py-2 px-4 rounded-md inline-block my-2 text-red-900 font-extrabold bg-red-100 whitespace-nowrap">
-                      Reject
-                    </td>
-                  </div>
+
+                  <td
+                    onClick={() => approveLeave(leave)}
+                    className="hover:shadow-lg py-2 px-4 rounded-md inline-block my-2 text-green-900 font-extrabold bg-green-100 whitespace-nowrap"
+                  >
+                    {loading ? "loading..." : "Approve"}
+                  </td>
+                  <td
+                    onClick={() => rejectLeave(leave)}
+                    className="mx-8 hover:shadow-lg py-2 px-4 rounded-md inline-block my-2 text-red-900 font-extrabold bg-red-100 whitespace-nowrap"
+                  >
+                    Reject
+                  </td>
                 </tr>
               ))}
             </tbody>
