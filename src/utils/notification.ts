@@ -1,3 +1,6 @@
+import { Leave } from "../interface/interface";
+import { updateUser } from "../services/database";
+
 export function notifySupervisor(
   leaveStartDate: number,
   supervisorEmail: string
@@ -58,7 +61,39 @@ export function sendNotification(email: string, message: string) {
   console.log(`Sending notification to ${email}: ${message}`);
 }
 
-// Example usage:
-const leaveStartDate = new Date("2023-12-01"); // Set the leave start date
-const supervisorEmail = "supervisor@example.com"; // Set the supervisor's email
-notifySupervisor(leaveStartDate.getTime(), supervisorEmail);
+export const scheduleAutomaticApproval = (leave: Leave, email: string) => {
+  const { startDate } = leave;
+  const threeDaysBeforeStartDate = new Date(startDate);
+  threeDaysBeforeStartDate.setDate(threeDaysBeforeStartDate.getDate() - 3);
+
+  const now = new Date();
+
+  // If the current date is less than three days before the leave start date
+  if (now < threeDaysBeforeStartDate) {
+    const timeUntilApproval =
+      threeDaysBeforeStartDate.getTime() - now.getTime();
+
+    // Schedule the automatic approval
+    setTimeout(() => {
+      approveLeave(leave, email);
+    }, timeUntilApproval);
+  }
+};
+
+export const approveLeave = (leave: Leave, email: string) => {
+  const { id } = leave;
+  const data = {
+    status: "approved",
+    startDate: new Date(leave.startDate).toDateString(),
+    leaveDays: leave?.leaveDays - leave?.requestedDays,
+    requestedDays: 0,
+  };
+
+  updateUser(id, data).then(() => {});
+
+  notification({
+    to: [leave.email, email],
+    subject: "Leave Request",
+    text: `Leave Request Approved for ${leave.email}`,
+  });
+};

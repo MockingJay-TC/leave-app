@@ -4,7 +4,10 @@ import DatePicker from "../components/DatePicker";
 import { updateUser } from "../services/database";
 import { calculateDays } from "../utils/calculateDays";
 import { countWeekends } from "../utils/calculateLeave";
-import { notifySupervisor } from "../utils/notification";
+import {
+  notifySupervisor,
+  scheduleAutomaticApproval,
+} from "../utils/notification";
 
 const Leavepage = () => {
   const [noOfDays, setNoOfDays] = useState<number>(0);
@@ -14,6 +17,7 @@ const Leavepage = () => {
   const leaveDays = JSON.parse(localStorage.getItem("user") as string)?.user
     ?.leaveDays;
   const id = JSON.parse(localStorage.getItem("user") as string)?.user.id;
+  const user = JSON.parse(localStorage.getItem("user") as string)?.user;
   const supervisor = JSON.parse(localStorage.getItem("user") as string)?.user
     .supervisor;
 
@@ -35,6 +39,7 @@ const Leavepage = () => {
     updateUser(id, data);
 
     notifySupervisor(fromDate, supervisor);
+    scheduleAutomaticApproval(user, supervisor);
   };
 
   const handleDisable = (): boolean => {

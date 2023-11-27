@@ -2,7 +2,7 @@ import { DocumentData, QuerySnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Leave } from "../interface/interface";
 import { getUser, updateUser } from "../services/database";
-import { notification } from "../utils/notification";
+import { approveLeave, notification } from "../utils/notification";
 
 const AdminPage = () => {
   const email = JSON.parse(localStorage.getItem("user") as string)?.user.email;
@@ -19,27 +19,6 @@ const AdminPage = () => {
       }
     );
   }, []);
-
-  const approveLeave = (leave: Leave) => {
-    setLoading(true);
-    const { id } = leave;
-    const data = {
-      status: "approved",
-      startDate: new Date(leave.startDate).toDateString(),
-      leaveDays: leave?.leaveDays - leave?.requestedDays,
-      requestedDays: 0,
-    };
-
-    updateUser(id, data).then(() => {
-      setLoading(false);
-    });
-
-    notification({
-      to: [leave.email, email],
-      subject: "Leave Request",
-      text: `Leave Request Approved for ${leave.email}`,
-    });
-  };
 
   const rejectLeave = (leave: Leave) => {
     setLoading(true);
@@ -101,7 +80,7 @@ const AdminPage = () => {
                   </td>
 
                   <td
-                    onClick={() => approveLeave(leave)}
+                    onClick={() => approveLeave(leave, email)}
                     className="hover:shadow-lg py-2 px-4 rounded-md inline-block my-2 text-green-900 font-extrabold bg-green-100 whitespace-nowrap"
                   >
                     {loading ? "loading..." : "Approve"}
